@@ -22,10 +22,10 @@ const UserSyncHandler = () => {
 
                 const userData = {
                     clerkId: user.id,
-                    email: user.primaryEmailAddress.emailAddress,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    photoUrl: user.imageUrl
+                    email: user.primaryEmailAddress?.emailAddress || "",
+                    firstName: user.firstName || "",
+                    lastName: user.lastName || "",
+                    photoUrl: user.imageUrl || ""
                 };
 
                 await axios.post(backendUrl+"/users", userData, {headers: {"Authorization": `Bearer ${token}`}});
@@ -38,7 +38,7 @@ const UserSyncHandler = () => {
             }
         }
     saveUser();
-    }, [isLoaded, isSignedIn, getToken, user, synced]);
+    }, [isLoaded, isSignedIn, getToken, user, synced, backendUrl, loadUserCredits]);
 
 
     return null;

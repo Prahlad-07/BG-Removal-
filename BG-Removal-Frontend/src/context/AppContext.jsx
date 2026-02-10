@@ -8,10 +8,10 @@ export const AppContext = createContext();
 
 const AppContextProvider = ( props ) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const [credit, setCredit] = useState(false);
+    const [credits, setCredits] = useState(0);
     const {getToken} = useAuth();
-    const [image, setImage] = useState(false);
-    const [resultImage, setResultImage] = useState(false);
+    const [image, setImage] = useState(null);
+    const [resultImage, setResultImage] = useState(null);
     const {isSignedIn} = useUser();
     const {openSignIn} = useClerk();
     const navigate = useNavigate();
@@ -21,11 +21,12 @@ const AppContextProvider = ( props ) => {
             const token = await getToken();
             const response = await axios.get(backendUrl+"/users/credits", {headers: {Authorization: `Bearer ${token}`}});
             if (response.data.success) {
-                setCredit(response.data.data.credits);
+                setCredits(response.data.data.credits);
             } else {
                 toast.error("Error loading credits.");
             }
         }catch (error) {
+            console.error("Failed to load credits:", error);
             toast.error("Error loading credits.");
         }
     }
@@ -33,31 +34,40 @@ const AppContextProvider = ( props ) => {
     const removeBg = async (selectedImage) => {
         try {
             if (!isSignedIn) {
-                return openSignIn();
+                openSignIn();
+                return;
+            }
+
+            if (!selectedImage) {
+                toast.error("Please select an image first.");
+                return;
             }
 
             setImage(selectedImage);
-            setResultImage(false);
+            setResultImage(null);
             //navigate to the result image
             navigate("/result");
 
             const token = await getToken();
             const formData = new FormData();
-            selectedImage && formData.append("file", selectedImage);
+            formData.append("file", selectedImage);
 
-            const {data: base64Image} = await axios.post(backendUrl+"/images/remove-background", formData, {headers: {Authorization: `Bearer ${token}`}});
-            setResultImage(`data:image/png;base64, ${base64Image}`);
-            setCredit(credit - 1);
+            const {data} = await axios.post(backendUrl+"/images/remove-background", formData, {headers: {Authorization: `Bearer ${token}`}});
+            
+            if (data.success) {
+                setResultImage(`data:image/png;base64,${data.data.image}`);
+                setCredits(data.data.creditsRemaining);
+            } else {
+                toast.error(data.data?.message || "Error while removing background.");
+            }
         }catch (error) {
-            console.error(error);
-            toast.error("Error while removing background image.");
+            console.error("Error removing background:", error);
+            toast.error(error.response?.data?.data || "Error while removing background image.");
         }
     }
 
-
-
     const contextValue = {
-        credit, setCredit,
+        credits, setCredits,
         image, setImage,
         resultImage, setResultImage,
         backendUrl,

@@ -5,6 +5,21 @@ import {useNavigate} from "react-router-dom";
 const Result = () => {
     const {image, resultImage} = useContext(AppContext);
     const navigate = useNavigate();
+    
+    // Fallback if user navigates directly without selecting an image
+    if (!image) {
+        return (
+            <div className="mx-4 my-3 lg:mx-44 mt-14 min-h-[75vh] flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600 mb-4">No image selected</p>
+                    <button onClick={() => navigate("/")} className="bg-indigo-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full">
+                        Go Back
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="mx-4 my-3 lg:mx-44 mt-14 min-h-[75vh]">
             <div className="bg-white rounded-lg px-8 py-6 shadow-md">
@@ -13,7 +28,7 @@ const Result = () => {
                     {/* Left side */}
                     <div className="flex flex-col">
                         <p className="font-semibold text-gray-600 mb-2">Original</p>
-                        <img src={image ? URL.createObjectURL(image): ""} alt="" className="rounded-md w-full object-cover" />
+                        <img src={image ? URL.createObjectURL(image): ""} alt="Original" className="rounded-md w-full object-cover" />
                     </div>
 
                     {/* Right side */}
@@ -22,7 +37,7 @@ const Result = () => {
                             Background Removed
                         </p>
                         <div className="rounded-md border border-gray-300 h-full bg-layer relative overflow-hidden">
-                            <img src={resultImage ? resultImage: ""} alt="" className="w-full object-cover" />
+                            <img src={resultImage ? resultImage: ""} alt="Processed" className="w-full object-cover" />
                             {!resultImage && image && (
                                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                     <div className="border-4 border-indigo-600 rounded-full h-12 w-12 border-t-transparent animate-spin">
@@ -39,7 +54,7 @@ const Result = () => {
                         <button className="border text-indigo-600 font-semibold py-2 px-4 rounded-full text-lg hover:scale-105 transition-all duration-300" onClick={() => navigate("/")}>
                             Try another image
                         </button>
-                        <a href={resultImage} download className="cursor-pointer py-3 px-6 text-center text-white font-semibold rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 shadow-lg hover:from-purple-600 hover:to-indigo-600 transition duration-300 ease-in-out transform hover:scale-105">
+                        <a href={resultImage} download="bg-removed.png" className="cursor-pointer py-3 px-6 text-center text-white font-semibold rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 shadow-lg hover:from-purple-600 hover:to-indigo-600 transition duration-300 ease-in-out transform hover:scale-105">
                             Download image
                         </a>
                     </div>
