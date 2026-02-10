@@ -29,7 +29,7 @@ public class OrderController {
         Map<String, Object> responseMap = new HashMap<>();
         RemoveBgResponse response = null;
         //validation
-        if (authentication.getName().isEmpty() || authentication.getName() == null) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().isEmpty()) {
             response = RemoveBgResponse.builder()
                     .statusCode(HttpStatus.FORBIDDEN)
                     .success(false)
@@ -39,7 +39,7 @@ public class OrderController {
         }
 
         try {
-            Order order = orderService.createOder(planId, authentication.getName());
+            Order order = orderService.createOrder(planId, authentication.getName());
             RazorpayOrderDTO responseDTO = convertToDTO(order);
             response = RemoveBgResponse.builder()
                     .success(true)

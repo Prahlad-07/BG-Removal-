@@ -60,7 +60,7 @@ public class RazorpayServiceImpl implements RazorpayService {
 
                 if (existingOrder.getPayment()) {
                     returnValue.put("success", false);
-                    returnValue.put("message", "Payment failed");
+                    returnValue.put("message", "Payment already processed");
                     return returnValue;
                 }
 
@@ -74,10 +74,11 @@ public class RazorpayServiceImpl implements RazorpayService {
                 returnValue.put("message", "Credits Added");
                 return returnValue;
             }
+            returnValue.put("success", false);
+            returnValue.put("message", "Payment not completed");
+            return returnValue;
         } catch (RazorpayException e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while verifying the payment");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while verifying the payment: " + e.getMessage());
         }
-        return returnValue;
     }
 }

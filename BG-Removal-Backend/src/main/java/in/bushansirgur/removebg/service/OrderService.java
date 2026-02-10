@@ -5,5 +5,5 @@ import com.razorpay.RazorpayException;
 
 public interface OrderService {
 
-    Order createOder(String planId, String clerkId) throws RazorpayException;
+    Order createOrder(String planId, String clerkId) throws RazorpayException;
 }

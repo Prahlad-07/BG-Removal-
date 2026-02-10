@@ -11,5 +11,4 @@ public class RemovebgApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RemovebgApplication.class, args);
 	}
-
 }

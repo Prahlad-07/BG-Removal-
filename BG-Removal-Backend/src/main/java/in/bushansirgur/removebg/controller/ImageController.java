@@ -32,7 +32,7 @@ public class ImageController {
         Map<String, Object> responseMap = new HashMap<>();
         try {
             //validation
-            if (authentication.getName().isEmpty() || authentication.getName() == null) {
+            if (authentication == null || authentication.getName() == null || authentication.getName().isEmpty()) {
                 response = RemoveBgResponse.builder()
                         .statusCode(HttpStatus.FORBIDDEN)
                         .success(false)
@@ -44,15 +44,15 @@ public class ImageController {
             UserDTO userDTO = userService.getUserByClerkId(authentication.getName());
 
             //validation
-            if (userDTO.getCredits() == 0) {
+            if (userDTO.getCredits() <= 0) {
                 responseMap.put("message", "No credit balance");
                 responseMap.put("creditBalance", userDTO.getCredits());
                 response = RemoveBgResponse.builder()
                         .success(false)
                         .data(responseMap)
-                        .statusCode(HttpStatus.OK)
+                        .statusCode(HttpStatus.BAD_REQUEST)
                         .build();
-                return ResponseEntity.ok(response);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             byte[] imageBytes = removeBackgroundService.removeBackground(file);
@@ -62,15 +62,20 @@ public class ImageController {
 
             userService.saveUser(userDTO);
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body(base64Image);
+            responseMap.put("success", true);
+            responseMap.put("image", base64Image);
+            responseMap.put("creditsRemaining", userDTO.getCredits());
+            response = RemoveBgResponse.builder()
+                    .statusCode(HttpStatus.OK)
+                    .success(true)
+                    .data(responseMap)
+                    .build();
+            return ResponseEntity.ok(response);
         }catch (Exception e) {
-            e.printStackTrace();
             response = RemoveBgResponse.builder()
                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
                     .success(false)
-                    .data("Something went wrong.")
+                    .data(e.getMessage() != null ? e.getMessage() : "Something went wrong.")
                     .build();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

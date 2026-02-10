@@ -3,7 +3,7 @@ package in.bushansirgur.removebg.controller;
 import in.bushansirgur.removebg.dto.UserDTO;
 import in.bushansirgur.removebg.response.RemoveBgResponse;
 import in.bushansirgur.removebg.service.UserService;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class UserController {
     public ResponseEntity<?> createOrUpdateUser(@RequestBody UserDTO userDTO, Authentication authentication) {
         RemoveBgResponse response = null;
         try {
-            if (!authentication.getName().equals(userDTO.getClerkId())) {
+            if (authentication == null || authentication.getName() == null || !authentication.getName().equals(userDTO.getClerkId())) {
                 response = RemoveBgResponse.builder()
                         .success(false)
                         .data("User does not have permission to access the resource")
@@ -55,7 +55,7 @@ public class UserController {
     public ResponseEntity<?> getUserCredits(Authentication authentication) {
         RemoveBgResponse bgResponse = null;
         try {
-            if (authentication.getName().isEmpty() || authentication.getName() == null) {
+            if (authentication == null || authentication.getName() == null || authentication.getName().isEmpty()) {
                 bgResponse = RemoveBgResponse.builder()
                         .statusCode(HttpStatus.FORBIDDEN)
                         .data("User does not have permission/access to this resource")

@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOder(String planId, String clerkId) throws RazorpayException {
+    public Order createOrder(String planId, String clerkId) throws RazorpayException {
         PlanDetails details = PLAN_DETAILS.get(planId);
         if (details == null) {
             throw new IllegalArgumentException("Invalid planId: "+planId);
